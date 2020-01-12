@@ -8,7 +8,9 @@ from pytray.aiothreads import LoopScheduler
 
 @pytest.fixture
 def loop_scheduler():
-    with LoopScheduler() as scheduler:
+    loop = asyncio.get_event_loop()
+    loop.set_debug(True)
+    with LoopScheduler(loop=loop) as scheduler:
         yield scheduler
 
 
@@ -53,7 +55,7 @@ def test_async_context_exception(loop_scheduler):
         await yield_()
 
     with pytest.raises(RuntimeError):
-        with loop_scheduler.ctx(raises_before_yield()):
+        with loop_scheduler.async_ctx(raises_before_yield()):
             pass
 
     @asynccontextmanager

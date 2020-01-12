@@ -27,6 +27,7 @@ setup(name="pytray",
       ],
       keywords='tools utilities',
       install_requires=[
+          'async_generator',
       ],
       python_requires=">=3.5",
       extras_require={
