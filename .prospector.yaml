@@ -4,6 +4,8 @@ ignore-paths:
     - test
     - utils
 
+test-warnings: false
+
 pylint:
     max-line-length: 120
     disable:
