@@ -7,7 +7,7 @@ ignore-paths:
 test-warnings: false
 
 pylint:
-    max-line-length: 120
+    max-line-length: 100
     disable:
       - missing-docstring
 
