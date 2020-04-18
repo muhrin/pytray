@@ -26,9 +26,7 @@ setup(name="pytray",
           'Programming Language :: Python :: 3.7',
       ],
       keywords='tools utilities',
-      install_requires=[
-          'async_generator',
-      ],
+      install_requires=['async_generator', 'deprecation'],
       python_requires=">=3.5",
       extras_require={
           'dev': [
