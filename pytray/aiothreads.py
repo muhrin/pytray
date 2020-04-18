@@ -75,20 +75,23 @@ def thread_future_chain_aio(future: ThreadFuture, aio_future: asyncio.Future):
 
 
 def aio_future_to_thread(aio_future: asyncio.Future):
-    """Convert an asyncio future to a thread future.  Mutations of the thread future will be propagated
-    to the asyncio future but not the other way around."""
+    """Convert an asyncio future to a thread future.  Mutations of the thread future will be
+    propagated to the asyncio future but not the other way around."""
     future = ThreadFuture()
     thread_future_chain_aio(future, aio_future)
     return future
 
 
 class LoopScheduler:
-    TASK_TIMEOUT = 5.
+    DEFAULT_TASK_TIMEOUT = 5.
 
-    def __init__(self, loop: asyncio.AbstractEventLoop = None, name='AsyncioScheduler', timeout=TASK_TIMEOUT):
+    def __init__(self,
+                 loop: asyncio.AbstractEventLoop = None,
+                 name='AsyncioScheduler',
+                 timeout=DEFAULT_TASK_TIMEOUT):
         self._loop = loop or asyncio.get_event_loop()
         self._name = name
-        self._timeout = timeout
+        self.task_timeout = timeout
         self._asyncio_thread = None
         self._stop_signal = None
         self._closed = False
@@ -142,13 +145,14 @@ class LoopScheduler:
 
     def await_(self, awaitable: typing.Awaitable):
         """
-        Await an awaitable on the event loop and return the result.  It may take a little time for the loop
-        to get around to scheduling it so we use a timeout as set by the TASK_TIMEOUT class constant.
+        Await an awaitable on the event loop and return the result.  It may take a little time for
+        the loop to get around to scheduling it so we use a timeout as set by the TASK_TIMEOUT class
+        constant.
 
         :param awaitable: the coroutine to run
         :return: the result of running the coroutine
         """
-        return self.await_submit(awaitable).result(timeout=self.TASK_TIMEOUT)
+        return self.await_submit(awaitable).result(timeout=self.task_timeout)
 
     def await_submit(self, awaitable: typing.Awaitable) -> ThreadFuture:
         """
@@ -170,7 +174,8 @@ class LoopScheduler:
         handle = self._loop.call_soon_threadsafe(callback)
 
         def handle_cancel(done_future: ThreadFuture):
-            """Function to propagate a cancellation of the concurrent future up to the loop callback"""
+            """Function to propagate a cancellation of the concurrent future up to the loop callback
+            """
             if done_future.cancelled():
                 self._loop.call_soon_threadsafe(handle.cancel)
 
@@ -180,13 +185,14 @@ class LoopScheduler:
 
     def run(self, func, *args, **kwargs):
         """
-        Run a function on the event loop and return the result.  It may take a little time for the loop
-        to get around to scheduling it so we use a timeout as set by the TASK_TIMEOUT class constant.
+        Run a function on the event loop and return the result.  It may take a little time for the
+        loop to get around to scheduling it so we use a timeout as set by the TASK_TIMEOUT class
+        constant.
 
         :param func: the coroutine to run
         :return: the result of running the coroutine
         """
-        return self.submit(func, *args, **kwargs).result(timeout=self.TASK_TIMEOUT)
+        return self.submit(func, *args, **kwargs).result(timeout=self.task_timeout)
 
     def submit(self, func, *args, **kwargs) -> ThreadFuture:
         """
@@ -208,7 +214,8 @@ class LoopScheduler:
         handle = self._loop.call_soon_threadsafe(callback)
 
         def handle_cancel(done_future: ThreadFuture):
-            """Function to propagate a cancellation of the concurrent future up to the loop callback"""
+            """Function to propagate a cancellation of the concurrent future up to the loop
+            callback"""
             if done_future.cancelled():
                 self._loop.call_soon_threadsafe(handle.cancel)
 
@@ -265,7 +272,8 @@ class LoopScheduler:
 
     def _run_loop(self, start_future):
         """Here we are on the aio thread"""
-        _LOGGER.debug('Starting event loop (id %s) on %s', id(self._loop), threading.current_thread())
+        _LOGGER.debug('Starting event loop (id %s) on %s', id(self._loop),
+                      threading.current_thread())
 
         asyncio.set_event_loop(self._loop)
         try:

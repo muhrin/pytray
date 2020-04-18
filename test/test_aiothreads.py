@@ -1,4 +1,5 @@
 import asyncio
+import concurrent.futures
 
 from async_generator import async_generator, yield_, asynccontextmanager
 import pytest
@@ -67,3 +68,18 @@ def test_async_context_exception(loop_scheduler):
     with pytest.raises(RuntimeError):
         with loop_scheduler.async_ctx(raises_after_yield()):
             pass
+
+
+def test_task_timeout():
+    loop = asyncio.get_event_loop()
+    loop.set_debug(True)
+
+    # First check a normal (sub timeout) situation
+    with LoopScheduler(loop=loop, timeout=0.1) as scheduler:
+        # Make sure the sleep is bigger than our timeout
+        scheduler.await_(asyncio.sleep(0.001))
+
+    # Now one where we time out
+    with pytest.raises(concurrent.futures.TimeoutError):
+        with LoopScheduler(loop=loop, timeout=0.1) as scheduler:
+            scheduler.await_(asyncio.sleep(1.))
