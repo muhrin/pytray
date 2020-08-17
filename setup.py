@@ -31,14 +31,14 @@ setup(name="pytray",
       extras_require={
           'dev': [
               'pip',
-              'pre-commit',
-              'pytest>=4',
+              'pre-commit~=2.2',
+              'pylint==2.5.2',
+              'pytest~=5.4',
               'pytest-cov',
               'ipython<6',
               'twine',
-              'yapf',
               'prospector',
-              'pylint',
+              'yapf',
           ],
           "docs": [
               "Sphinx==1.8.4",
