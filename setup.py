@@ -30,8 +30,10 @@ setup(name="pytray",
       python_requires=">=3.5",
       extras_require={
           'dev': [
+              'grayskull',
               'pip',
-              'pre-commit~=2.2',
+              'pre-commit~=2.2;python_version>"3.5"',
+              'pre-commit~=1.21;python_version<="3.5"',
               'pylint==2.5.2',
               'pytest~=5.4',
               'pytest-cov',
