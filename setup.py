@@ -2,7 +2,7 @@
 from setuptools import setup
 
 __author__ = 'Martin Uhrin'
-__license__ = 'GPLv3'
+__license__ = 'LGPLv3'
 
 about = {}
 with open('pytray/version.py') as f:
@@ -18,7 +18,7 @@ setup(name='pytray',
       license=__license__,
       classifiers=[
           'Development Status :: 4 - Beta',
-          'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+          'License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)',
           'Programming Language :: Python :: 3.5',
           'Programming Language :: Python :: 3.6',
           'Programming Language :: Python :: 3.7',
