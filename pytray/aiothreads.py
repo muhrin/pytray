@@ -143,16 +143,24 @@ class LoopScheduler:
         stop_future.result()
         aio_thread.join()
 
-    def await_(self, awaitable: typing.Awaitable):
+    def await_(self, awaitable: typing.Awaitable, *, name: str = None):
         """
         Await an awaitable on the event loop and return the result.  It may take a little time for
         the loop to get around to scheduling it so we use a timeout as set by the TASK_TIMEOUT class
         constant.
 
         :param awaitable: the coroutine to run
+        :param name: an optional name for the awaitable to aid with debugging.  If no name is
+            supplied will attempt to use `awaitable.__name__`.
         :return: the result of running the coroutine
         """
-        return self.await_submit(awaitable).result(timeout=self.task_timeout)
+        try:
+            return self.await_submit(awaitable).result(timeout=self.task_timeout)
+        except concurrent.futures.TimeoutError as exc:
+            # Try to get a reasonable name for the awaitable
+            name = name or getattr(awaitable, '__name__', 'Awaitable')
+            raise concurrent.futures.TimeoutError("{} after {} seconds".format(
+                name, self.task_timeout)) from exc
 
     def await_submit(self, awaitable: typing.Awaitable) -> ThreadFuture:
         """
