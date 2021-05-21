@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 from setuptools import setup
 
-__author__ = "Martin Uhrin"
-__license__ = "GPLv3"
+__author__ = 'Martin Uhrin'
+__license__ = 'GPLv3'
 
 about = {}
 with open('pytray/version.py') as f:
     exec(f.read(), about)
 
-setup(name="pytray",
+setup(name='pytray',
       version=about['__version__'],
       description='A python tools library for baking pies',
       long_description=open('README.rst').read(),
@@ -26,7 +26,7 @@ setup(name="pytray",
       ],
       keywords='tools utilities',
       install_requires=['async_generator', 'deprecation'],
-      python_requires=">=3.5",
+      python_requires='>=3.5',
       extras_require={
           'dev': [
               'grayskull',
@@ -41,10 +41,10 @@ setup(name="pytray",
               'prospector',
               'yapf',
           ],
-          "docs": [
-              "Sphinx==1.8.4",
-              "Pygments==2.3.1",
-              "docutils==0.14",
+          'docs': [
+              'Sphinx==1.8.4',
+              'Pygments==2.3.1',
+              'docutils==0.14',
           ],
       },
       packages=['pytray'],

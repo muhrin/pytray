@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import contextlib
 
 __all__ = ('capture_exceptions',)

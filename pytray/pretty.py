@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Pretty printing functions"""
 
 import typing
@@ -15,9 +16,9 @@ def type_string(obj_type: typing.Type) -> str:
     return type_str
 
 
-@deprecation.deprecated(deprecated_in="0.2.1",
-                        removed_in="0.3.0",
+@deprecation.deprecated(deprecated_in='0.2.1',
+                        removed_in='0.3.0',
                         current_version=__version__,
-                        details="Use type_string() instead")
+                        details='Use type_string() instead')
 def pretty_type_string(obj_type: typing.Type) -> str:
     return type_string(obj_type)

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from pytray import tree
 
 
@@ -30,4 +31,4 @@ def test_flattening_filter():
 
 def test_path_to_string():
     pathstring = tree.path_to_string(('a', 'b', 'c', 0, 'd'))
-    assert pathstring == "a.b.c.0.d"
+    assert pathstring == 'a.b.c.0.d'

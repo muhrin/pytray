@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """A tree in this context is considered a nested container containing either lists or
 dictionaries and with anything else being considered a leaf.  Paths to particular points
 in the data structure are represented as sequences containing the index at each level"""
@@ -21,7 +22,7 @@ def set_by_path(root, items, value):
 
 
 def path_to_string(path: tuple) -> str:
-    return ".".join((str(key) for key in path))
+    return '.'.join((str(key) for key in path))
 
 
 def transform(visitor, root, path: tuple = (), **kwargs):

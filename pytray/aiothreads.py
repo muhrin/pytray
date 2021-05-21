@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 A module to create interoperability between concurrent threads and asyncio.
 
@@ -119,7 +120,7 @@ class LoopScheduler:
         self._closed = True
 
     def start(self):
-        assert self._asyncio_thread is None, "Already running"
+        assert self._asyncio_thread is None, 'Already running'
 
         start_future = ThreadFuture()
 
@@ -159,7 +160,7 @@ class LoopScheduler:
         except concurrent.futures.TimeoutError as exc:
             # Try to get a reasonable name for the awaitable
             name = name or getattr(awaitable, '__name__', 'Awaitable')
-            raise concurrent.futures.TimeoutError("{} after {} seconds".format(
+            raise concurrent.futures.TimeoutError('{} after {} seconds'.format(
                 name, self.task_timeout)) from exc
 
     def await_submit(self, awaitable: typing.Awaitable) -> ThreadFuture:

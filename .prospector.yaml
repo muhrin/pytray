@@ -19,4 +19,3 @@ pep8:
 
 mccabe:
   run: false
-
