@@ -69,7 +69,7 @@ def test_async_context_exception(
 
 
 def test_task_timeout():
-    loop = asyncio.get_event_loop()
+    loop = asyncio.new_event_loop()
     loop.set_debug(True)
 
     # First check a normal (sub timeout) situation
