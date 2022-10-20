@@ -37,7 +37,6 @@ setup(
             "pytest-cov",
             "ipython<6",
             "twine",
-            "yapf",
         ],
         "docs": [
             "Sphinx==1.8.4",
