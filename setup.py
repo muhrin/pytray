@@ -32,8 +32,8 @@ setup(
         "dev": [
             "grayskull",
             "pip",
-            "pre-commit~=2.2",
-            "pytest~=5.4",
+            "pre-commit",
+            "pytest",
             "pytest-cov",
             "ipython<6",
             "twine",
