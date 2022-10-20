@@ -15,6 +15,7 @@ import logging
 import sys
 import threading
 import typing
+from typing import Callable
 
 from . import futures
 
@@ -52,7 +53,7 @@ def aio_future_chain_thread(aio_future: asyncio.Future, future: ThreadFuture):
 
 def thread_future_chain_aio(future: ThreadFuture, aio_future: asyncio.Future):
     """Chain a thread future to an asyncio future
-    If the reulst of the thread future is another thread future this will also be
+    If the result of the thread future is another thread future this will also be
     chained so the client only sees aio futures"""
     loop = aio_future._loop  # pylint: disable=protected-access
 
@@ -90,7 +91,7 @@ class LoopScheduler:
                  loop: asyncio.AbstractEventLoop = None,
                  name='AsyncioScheduler',
                  timeout=DEFAULT_TASK_TIMEOUT):
-        self._loop = loop or asyncio.get_event_loop()
+        self._loop = loop or asyncio.new_event_loop()
         self._name = name
         self.task_timeout = timeout
         self._asyncio_thread = None
@@ -147,7 +148,7 @@ class LoopScheduler:
     def await_(self, awaitable: typing.Awaitable, *, name: str = None):
         """
         Await an awaitable on the event loop and return the result.  It may take a little time for
-        the loop to get around to scheduling it so we use a timeout as set by the TASK_TIMEOUT class
+        the loop to get around to scheduling it, so we use a timeout as set by the TASK_TIMEOUT class
         constant.
 
         :param awaitable: the coroutine to run
@@ -167,30 +168,18 @@ class LoopScheduler:
         """
         Schedule an awaitable on the loop and return the corresponding future
         """
+
+        async def coro():
+            res = await awaitable
+            if asyncio.isfuture(res):
+                future = ThreadFuture()
+                aio_future_chain_thread(res, future)
+                return future
+
+            return res
+
         self._ensure_running()
-
-        future = ThreadFuture()
-
-        def callback():
-            # Here we're on the comms thread again
-            async def proxy():
-                if not future.cancelled():
-                    return await awaitable
-
-            coro_future = asyncio.ensure_future(proxy(), loop=self._loop)
-            aio_future_chain_thread(coro_future, future)
-
-        handle = self._loop.call_soon_threadsafe(callback)
-
-        def handle_cancel(done_future: ThreadFuture):
-            """Function to propagate a cancellation of the concurrent future up to the loop callback
-            """
-            if done_future.cancelled():
-                self._loop.call_soon_threadsafe(handle.cancel)
-
-        future.add_done_callback(handle_cancel)
-
-        return future
+        return asyncio.run_coroutine_threadsafe(coro(), loop=self._loop)
 
     def run(self, func, *args, **kwargs):
         """
@@ -203,7 +192,7 @@ class LoopScheduler:
         """
         return self.submit(func, *args, **kwargs).result(timeout=self.task_timeout)
 
-    def submit(self, func, *args, **kwargs) -> ThreadFuture:
+    def submit(self, func: Callable, *args, **kwargs) -> ThreadFuture:
         """
         Schedule a function on the loop and return the corresponding future
         """
@@ -238,7 +227,11 @@ class LoopScheduler:
         aexit = ctx_manager.__aexit__
         aenter = ctx_manager.__aenter__
 
-        result = self.await_(aenter())
+        # result = self.await_(aenter())
+        result = asyncio.run_coroutine_threadsafe(aenter(), loop=self._loop).result()
+        # Make sure that if we got a future, we convert it appropriately
+        if asyncio.isfuture(result):
+            result = aio_future_to_thread(result)
         try:
             yield result
         except Exception:  # pylint: disable=broad-except

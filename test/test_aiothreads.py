@@ -10,7 +10,7 @@ from pytray.aiothreads import LoopScheduler
 
 @pytest.fixture
 def loop_scheduler():
-    loop = asyncio.get_event_loop()
+    loop = asyncio.new_event_loop()
     loop.set_debug(True)
     with LoopScheduler(loop=loop) as scheduler:
         yield scheduler
@@ -90,3 +90,52 @@ def test_task_timeout():
         with LoopScheduler(loop=loop, timeout=0.1) as scheduler:
             scheduler.await_(asyncio.sleep(1.), name="sleepin'...zZzZ")
     assert "sleepin'...zZzZ" in str(excinfo.value)
+
+
+def test_task_cancel(loop_scheduler):  # pylint: disable=redefined-outer-name
+    evt = asyncio.Event()
+
+    async def set_env():
+        evt.set()
+
+    loop_scheduler.await_submit(set_env()).result()
+    assert evt.is_set()
+
+    evt.clear()
+    loop_scheduler.await_submit(set_env()).cancel()
+    assert not evt.is_set()
+
+
+def test_await_futures(loop_scheduler):  # pylint: disable=redefined-outer-name
+    """Test that a series of Futures works correctly"""
+
+    async def inception():
+        fut = asyncio.Future()
+        fut2 = asyncio.Future()
+        fut3 = asyncio.Future()
+
+        fut.set_result(True)
+        fut2.set_result(fut)
+        fut3.set_result(fut2)
+
+        return fut3
+
+    assert loop_scheduler.await_(inception()).result().result().result() is True
+
+
+def test_await_ctx_futures(loop_scheduler):  # pylint: disable=redefined-outer-name
+    """Test that an async context yielding a future is correctly handled i.e. the asyncio future
+    should be converted to a concurrent one and the result be propagated back to the asyncio future
+    in the context"""
+
+    @asynccontextmanager
+    async def ctx():
+        fut = asyncio.Future()
+        try:
+            yield fut
+        finally:
+            assert fut.result() is True
+
+    with loop_scheduler.async_ctx(ctx()) as future:
+        assert isinstance(future, concurrent.futures.Future)
+        future.set_result(True)
