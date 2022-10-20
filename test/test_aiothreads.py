@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import asyncio
 import concurrent.futures
+import contextlib
 
-from async_generator import async_generator, yield_, asynccontextmanager
 import pytest
 
 from pytray.aiothreads import LoopScheduler
@@ -34,11 +34,10 @@ def test_simple_await(loop_scheduler):  # pylint: disable=redefined-outer-name
 def test_async_context(loop_scheduler):  # pylint: disable=redefined-outer-name
     sequence = []
 
-    @asynccontextmanager
-    @async_generator
+    @contextlib.asynccontextmanager
     async def do_():
         sequence.append("Entered")
-        await yield_(10)
+        yield 10
         sequence.append("Exiting")
 
     with loop_scheduler.async_ctx(do_()) as value:
@@ -50,20 +49,18 @@ def test_async_context(loop_scheduler):  # pylint: disable=redefined-outer-name
 def test_async_context_exception(
     loop_scheduler,
 ):  # pylint: disable=redefined-outer-name
-    @asynccontextmanager
-    @async_generator
+    @contextlib.asynccontextmanager
     async def raises_before_yield():
         raise RuntimeError
-        # await yield_()
+        yield
 
     with pytest.raises(RuntimeError):
         with loop_scheduler.async_ctx(raises_before_yield()):
             pass
 
-    @asynccontextmanager
-    @async_generator
+    @contextlib.asynccontextmanager
     async def raises_after_yield():
-        await yield_()
+        yield
         raise RuntimeError
 
     with pytest.raises(RuntimeError):
@@ -129,7 +126,7 @@ def test_await_ctx_futures(loop_scheduler):  # pylint: disable=redefined-outer-n
     should be converted to a concurrent one and the result be propagated back to the asyncio future
     in the context"""
 
-    @asynccontextmanager
+    @contextlib.asynccontextmanager
     async def ctx():
         fut = asyncio.Future()
         try:
