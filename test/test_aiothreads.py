@@ -22,13 +22,13 @@ async def simple(arg):
 
 
 def test_simple_await_submit(loop_scheduler):  # pylint: disable=redefined-outer-name
-    future = loop_scheduler.await_submit(simple('Done!'))
-    assert future.result() == 'Done!'
+    future = loop_scheduler.await_submit(simple("Done!"))
+    assert future.result() == "Done!"
 
 
 def test_simple_await(loop_scheduler):  # pylint: disable=redefined-outer-name
-    result = loop_scheduler.await_(simple('Done!'))
-    assert result == 'Done!'
+    result = loop_scheduler.await_(simple("Done!"))
+    assert result == "Done!"
 
 
 def test_async_context(loop_scheduler):  # pylint: disable=redefined-outer-name
@@ -37,18 +37,19 @@ def test_async_context(loop_scheduler):  # pylint: disable=redefined-outer-name
     @asynccontextmanager
     @async_generator
     async def do_():
-        sequence.append('Entered')
+        sequence.append("Entered")
         await yield_(10)
-        sequence.append('Exiting')
+        sequence.append("Exiting")
 
     with loop_scheduler.async_ctx(do_()) as value:
         assert value == 10
 
-    assert sequence == ['Entered', 'Exiting']
+    assert sequence == ["Entered", "Exiting"]
 
 
-def test_async_context_exception(loop_scheduler):  # pylint: disable=redefined-outer-name
-
+def test_async_context_exception(
+    loop_scheduler,
+):  # pylint: disable=redefined-outer-name
     @asynccontextmanager
     @async_generator
     async def raises_before_yield():
@@ -82,13 +83,13 @@ def test_task_timeout():
     # Now one where we time out
     with pytest.raises(concurrent.futures.TimeoutError) as excinfo:
         with LoopScheduler(loop=loop, timeout=0.1) as scheduler:
-            scheduler.await_(asyncio.sleep(1.))
+            scheduler.await_(asyncio.sleep(1.0))
     assert asyncio.sleep.__name__ in str(excinfo.value)
 
     # Test supplying a custom name
     with pytest.raises(concurrent.futures.TimeoutError) as excinfo:
         with LoopScheduler(loop=loop, timeout=0.1) as scheduler:
-            scheduler.await_(asyncio.sleep(1.), name="sleepin'...zZzZ")
+            scheduler.await_(asyncio.sleep(1.0), name="sleepin'...zZzZ")
     assert "sleepin'...zZzZ" in str(excinfo.value)
 
 

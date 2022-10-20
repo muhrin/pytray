@@ -19,7 +19,7 @@ from typing import Callable
 
 from . import futures
 
-__all__ = ('LoopScheduler',)
+__all__ = ("LoopScheduler",)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -85,12 +85,14 @@ def aio_future_to_thread(aio_future: asyncio.Future):
 
 
 class LoopScheduler:
-    DEFAULT_TASK_TIMEOUT = 5.
+    DEFAULT_TASK_TIMEOUT = 5.0
 
-    def __init__(self,
-                 loop: asyncio.AbstractEventLoop = None,
-                 name='AsyncioScheduler',
-                 timeout=DEFAULT_TASK_TIMEOUT):
+    def __init__(
+        self,
+        loop: asyncio.AbstractEventLoop = None,
+        name="AsyncioScheduler",
+        timeout=DEFAULT_TASK_TIMEOUT,
+    ):
         self._loop = loop or asyncio.new_event_loop()
         self._name = name
         self.task_timeout = timeout
@@ -121,14 +123,14 @@ class LoopScheduler:
         self._closed = True
 
     def start(self):
-        assert self._asyncio_thread is None, 'Already running'
+        if self._asyncio_thread is not None:
+            raise RuntimeError("Already running")
 
         start_future = ThreadFuture()
 
-        self._asyncio_thread = threading.Thread(target=self._run_loop,
-                                                name=self._name,
-                                                args=(start_future,),
-                                                daemon=True)
+        self._asyncio_thread = threading.Thread(
+            target=self._run_loop, name=self._name, args=(start_future,), daemon=True
+        )
         self._asyncio_thread.start()
         start_future.result()
 
@@ -140,7 +142,9 @@ class LoopScheduler:
 
         stop_future = ThreadFuture()
         # Send the stop signal
-        self._loop.call_soon_threadsafe(partial(self._stop_signal.set_result, stop_future))
+        self._loop.call_soon_threadsafe(
+            partial(self._stop_signal.set_result, stop_future)
+        )
         # Wait for the result in case there was an exception
         stop_future.result()
         aio_thread.join()
@@ -160,9 +164,10 @@ class LoopScheduler:
             return self.await_submit(awaitable).result(timeout=self.task_timeout)
         except concurrent.futures.TimeoutError as exc:
             # Try to get a reasonable name for the awaitable
-            name = name or getattr(awaitable, '__name__', 'Awaitable')
-            raise concurrent.futures.TimeoutError('{} after {} seconds'.format(
-                name, self.task_timeout)) from exc
+            name = name or getattr(awaitable, "__name__", "Awaitable")
+            raise concurrent.futures.TimeoutError(
+                "{} after {} seconds".format(name, self.task_timeout)
+            ) from exc
 
     def await_submit(self, awaitable: typing.Awaitable) -> ThreadFuture:
         """
@@ -274,8 +279,11 @@ class LoopScheduler:
 
     def _run_loop(self, start_future):
         """Here we are on the aio thread"""
-        _LOGGER.debug('Starting event loop (id %s) on %s', id(self._loop),
-                      threading.current_thread())
+        _LOGGER.debug(
+            "Starting event loop (id %s) on %s",
+            id(self._loop),
+            threading.current_thread(),
+        )
 
         asyncio.set_event_loop(self._loop)
         try:
@@ -293,6 +301,6 @@ class LoopScheduler:
             # The loop is finished
             self._asyncio_thread = None
 
-            _LOGGER.debug('Event loop stopped on %s', threading.current_thread())
+            _LOGGER.debug("Event loop stopped on %s", threading.current_thread())
         finally:
             asyncio.set_event_loop(None)

@@ -12,7 +12,9 @@ class WeakObjectIdDict(collections.MutableMapping):
     """
 
     def __init__(self, seq=None, **kwargs):
-        self._refs = {}  # type: collections.abc.MutableMapping[int, weakref.ReferenceType]
+        self._refs = (
+            {}
+        )  # type: collections.abc.MutableMapping[int, weakref.ReferenceType]
         self._values = {}  # type: collections.abc.MutableMapping[int, typing.Any]
         if seq:
             if isinstance(seq, collections.abc.Mapping):

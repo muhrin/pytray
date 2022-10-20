@@ -22,7 +22,7 @@ def set_by_path(root, items, value):
 
 
 def path_to_string(path: tuple) -> str:
-    return '.'.join((str(key) for key in path))
+    return ".".join((str(key) for key in path))
 
 
 def transform(visitor, root, path: tuple = (), **kwargs):
@@ -32,9 +32,15 @@ def transform(visitor, root, path: tuple = (), **kwargs):
     """
 
     if isinstance(root, dict):
-        return {key: visitor(value, path=path + (key,), **kwargs) for key, value in root.items()}
+        return {
+            key: visitor(value, path=path + (key,), **kwargs)
+            for key, value in root.items()
+        }
     if isinstance(root, list):
-        return [visitor(value, path=path + (idx,), **kwargs) for idx, value in enumerate(root)]
+        return [
+            visitor(value, path=path + (idx,), **kwargs)
+            for idx, value in enumerate(root)
+        ]
 
     return root
 
@@ -44,8 +50,9 @@ def flatten(root, filter=None) -> dict:  # pylint: disable=redefined-builtin
     leaves as values"""
 
     def should_flatten(value):
-        return (isinstance(value, (dict, list)) and bool(value)) \
-               and (filter is None or filter(value))
+        return (isinstance(value, (dict, list)) and bool(value)) and (
+            filter is None or filter(value)
+        )
 
     def do_flattening(entry, path=()):
         if should_flatten(entry):

@@ -3,14 +3,14 @@
 from typing import Union
 import types
 
-__version__ = '0.0.1'
+__version__ = "0.0.1"
 
-__all__ = '__version__', 'load_obj', 'full_name'
+__all__ = "__version__", "load_obj", "full_name"
 
 
 def load_obj(name: str) -> Union[type, types.FunctionType, types.BuiltinFunctionType]:
     """Load a type from a fully qualified name"""
-    components = name.split('.')
+    components = name.split(".")
     mod = __import__(components[0])
     # Get the components one by one
     for comp in components[1:]:
@@ -18,7 +18,8 @@ def load_obj(name: str) -> Union[type, types.FunctionType, types.BuiltinFunction
     return mod
 
 
-def full_name(symbol: Union[type, types.FunctionType, types.BuiltinFunctionType]) -> str:
-    """Get the fully qualified name of a type.
-    """
-    return symbol.__module__ + '.' + symbol.__name__
+def full_name(
+    symbol: Union[type, types.FunctionType, types.BuiltinFunctionType]
+) -> str:
+    """Get the fully qualified name of a type."""
+    return symbol.__module__ + "." + symbol.__name__
