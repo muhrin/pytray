@@ -15,9 +15,7 @@ while true; do
 done
 
 
-sed -i "0,/__version__* =.*/s//__version__ = \'${version}\'/" $VERSION_FILE
-
-exit
+sed -i '0,/__version__* =.*/s//__version__ = \"${version}\"/' $VERSION_FILE
 
 current_branch=`git rev-parse --abbrev-ref HEAD`
 
