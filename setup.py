@@ -26,19 +26,17 @@ setup(
         "Programming Language :: Python :: 3.10",
     ],
     keywords="tools utilities",
-    install_requires=["async_generator", "deprecation"],
+    install_requires=["deprecation"],
     python_requires=">=3.7",
     extras_require={
         "dev": [
             "grayskull",
             "pip",
             "pre-commit~=2.2",
-            "pylint==2.5.2",
             "pytest~=5.4",
             "pytest-cov",
             "ipython<6",
             "twine",
-            "prospector",
             "yapf",
         ],
         "docs": [
