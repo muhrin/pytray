@@ -1,12 +1,8 @@
-# -*- coding: utf-8 -*-
+from . import aiothreads, futures, tree, version
 from .version import *
-from . import aiothreads
-from . import futures
-from . import tree
-from . import version
 
-__all__ = version.__all__ + (
+__all__ = version.__all__ + (  # pylint: disable=undefined-variable
     "aiothreads",
     "futures",
     "tree",
-)  # pylint: disable=undefined-variable
+)

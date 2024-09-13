@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 A module to create interoperability between concurrent threads and asyncio.
 
@@ -6,15 +5,16 @@ An asyncio event loop can be running on a thread on which coroutines can be sche
 from a different threads.  The result is returned as a concurrent future which can be
 waited on.
 """
+
 import asyncio
 import concurrent.futures
-from concurrent.futures import Future as ThreadFuture
-from contextlib import contextmanager
-from functools import partial
 import logging
 import sys
 import threading
 import typing
+from concurrent.futures import Future as ThreadFuture
+from contextlib import contextmanager
+from functools import partial
 from typing import Callable, Union
 
 from . import futures
@@ -152,8 +152,8 @@ class LoopScheduler:
     def await_(self, awaitable: typing.Awaitable, *, name: str = None):
         """
         Await an awaitable on the event loop and return the result.  It may take a little time for
-        the loop to get around to scheduling it, so we use a timeout as set by the TASK_TIMEOUT class
-        constant.
+        the loop to get around to scheduling it, so we use a timeout as set by the TASK_TIMEOUT
+        class constant.
 
         :param awaitable: the coroutine to run
         :param name: an optional name for the awaitable to aid with debugging.  If no name is
@@ -166,7 +166,7 @@ class LoopScheduler:
             # Try to get a reasonable name for the awaitable
             name = name or getattr(awaitable, "__name__", "Awaitable")
             raise concurrent.futures.TimeoutError(
-                "{} after {} seconds".format(name, self.task_timeout)
+                f"{name} after {self.task_timeout} seconds"
             ) from exc
 
     def await_submit(self, awaitable: typing.Awaitable) -> ThreadFuture:
@@ -273,12 +273,19 @@ class LoopScheduler:
                 yield target
 
     def call_at(self, when: Union[int, float], callback, *args) -> asyncio.TimerHandle:
-        """Schedule `callback` to be called at a given absolute timestamp `when` (an int or a float), using the same
-        time reference as scheduler.time()"""
-        return self.submit(self._loop.call_at, when, callback, *args).result(timeout=self.task_timeout)
+        """
+        Schedule `callback` to be called at a given absolute timestamp `when` (an int or a float),
+        using the same time reference as `scheduler.time()`
+        """
+        return self.submit(self._loop.call_at, when, callback, *args).result(
+            timeout=self.task_timeout
+        )
 
     def time(self) -> float:
-        """Return the current time, as a float value, according to the event loop’s internal monotonic clock."""
+        """
+        Return the current time, as a float value, according to the event loop’s internal monotonic
+        clock.
+        """
         return self._loop.time()
 
     def _ensure_running(self):

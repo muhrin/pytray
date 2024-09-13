@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
 import enum
 import re
+
 from pytray import obj_load
 
 

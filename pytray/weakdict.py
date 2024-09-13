@@ -1,26 +1,22 @@
-# -*- coding: utf-8 -*-
-import collections
 import collections.abc
-import typing
 import weakref
+from typing import Any, Iterable, Mapping
 
 
-class WeakObjectIdDict(collections.MutableMapping):
+class WeakObjectIdDict(collections.abc.MutableMapping):
     """
-    Like weakref.WeakKeyDict but internally uses object ids instead of the object reference
+    Like `weakref.WeakKeyDict` but internally uses object ids instead of the object reference
     itself thereby avoiding the need for the object to be hashable (and therefore immutable).
     """
 
     def __init__(self, seq=None, **kwargs):
-        self._refs = (
-            {}
-        )  # type: collections.abc.MutableMapping[int, weakref.ReferenceType]
-        self._values = {}  # type: collections.abc.MutableMapping[int, typing.Any]
+        self._refs: dict[int, weakref.ReferenceType] = {}
+        self._values: dict[int, Any] = {}
         if seq:
-            if isinstance(seq, collections.abc.Mapping):
+            if isinstance(seq, Mapping):
                 for key, value in seq.items():
                     self[key] = value
-            elif isinstance(seq, collections.Iterable):
+            elif isinstance(seq, Iterable):
                 for key, value in seq:
                     self[key] = value
         if kwargs:
@@ -34,7 +30,7 @@ class WeakObjectIdDict(collections.MutableMapping):
         try:
             return self._values[id(item)]
         except KeyError:
-            raise KeyError(str(item))
+            raise KeyError(str(item)) from None
 
     def __setitem__(self, key, value):
         obj_id = id(key)

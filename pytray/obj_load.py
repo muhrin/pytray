@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
 """Module for methods used to load objects/symbols dynamically in python"""
-from typing import Union
+
 import types
+from typing import Union
 
 __version__ = "0.0.1"
 

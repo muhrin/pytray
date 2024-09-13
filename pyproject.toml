@@ -1,0 +1,60 @@
+[build-system]
+requires = ['flit_core >=3.4,<4']
+build-backend = 'flit_core.buildapi'
+
+
+[project]
+name = "pytray"
+dynamic = ["version"]
+author = "Martin Uhrin"
+author_email = "martin.uhrin.10@ucl.ac.uk"
+readme = 'README.rst'
+license = { file = 'LICENSE.txt' }
+description = "A python tools library for baking pies"
+keywords = ["tools", "utilities"]
+url = "https://github.com/muhrin/pytray.git"
+long_description = "file: README.rst"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "deprecation",
+]
+python_requires = ">=3.8"
+test_suite = "test"
+
+[project.urls]
+Home = 'https://github.com/muhrin/pytray'
+Source = 'https://github.com/muhrin/pytray'
+
+[project.optional-dependencies]
+dev = [
+    "grayskull",
+    "pip",
+    "pre-commit",
+    "pytest",
+    "pytest-cov",
+    "ipython<6",
+    "pylint",
+]
+
+[tool.flit.module]
+name = 'pytray'
+
+[tool.flit.sdist]
+exclude = [
+    '.github/',
+    'docs/',
+    'examples/',
+    'test/',
+]
+
+[tool.bandit]
+exclude_dirs = ["test/"]
+skips = ["B101"]

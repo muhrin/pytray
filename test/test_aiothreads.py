@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import asyncio
 import concurrent.futures
 import contextlib
@@ -48,7 +47,7 @@ def test_async_context(loop_scheduler):  # pylint: disable=redefined-outer-name
 
 
 def test_async_context_exception(
-        loop_scheduler,
+    loop_scheduler,
 ):  # pylint: disable=redefined-outer-name
     @contextlib.asynccontextmanager
     async def raises_before_yield():
@@ -154,10 +153,10 @@ def test_scheduler_call_at(loop_scheduler):
         evt.set()
 
     loop_scheduler.call_at(loop_scheduler.time() + 0.001, set)
-    assert evt.wait(timeout=1.) is True
+    assert evt.wait(timeout=1.0) is True
 
     evt.clear()
-    handle = loop_scheduler.call_at(loop_scheduler.time() + 10., set)
+    handle = loop_scheduler.call_at(loop_scheduler.time() + 10.0, set)
     handle.cancel()
     assert handle.cancelled()
     assert not evt.is_set()

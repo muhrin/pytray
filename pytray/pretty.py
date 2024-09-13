@@ -1,15 +1,12 @@
-# -*- coding: utf-8 -*-
 """Pretty printing functions"""
-
-import typing
 
 import deprecation
 
 from .version import __version__
 
 
-def type_string(obj_type: typing.Type) -> str:
-    """Given an type will return a simple type string"""
+def type_string(obj_type: type) -> str:
+    """Given a type will return a simple type string"""
     type_str = str(obj_type)
     if type_str.startswith("<class "):
         return type_str[8:-2]
@@ -22,5 +19,5 @@ def type_string(obj_type: typing.Type) -> str:
     current_version=__version__,
     details="Use type_string() instead",
 )
-def pretty_type_string(obj_type: typing.Type) -> str:
+def pretty_type_string(obj_type: type) -> str:
     return type_string(obj_type)

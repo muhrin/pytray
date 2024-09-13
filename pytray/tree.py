@@ -1,14 +1,15 @@
-# -*- coding: utf-8 -*-
 """A tree in this context is considered a nested container containing either lists or
 dictionaries and with anything else being considered a leaf.  Paths to particular points
 in the data structure are represented as sequences containing the index at each level"""
-from functools import reduce
+
 import operator
+from functools import reduce
 
 
 def get_by_path(root, items):
     """Access a nested object in root by item sequence.  Taken from:
-    https://stackoverflow.com/questions/14692690/access-nested-dictionary-items-via-a-list-of-keys"""
+    https://stackoverflow.com/questions/14692690/access-nested-dictionary-items-via-a-list-of-keys
+    """
     if not items:
         # Support either empty items or None items meaning give back root
         return root
@@ -17,7 +18,8 @@ def get_by_path(root, items):
 
 def set_by_path(root, items, value):
     """Set a value in a nested object in root by item sequence.  Taken from:
-    https://stackoverflow.com/questions/14692690/access-nested-dictionary-items-via-a-list-of-keys"""
+    https://stackoverflow.com/questions/14692690/access-nested-dictionary-items-via-a-list-of-keys
+    """
     get_by_path(root, items[:-1])[items[-1]] = value
 
 
@@ -64,7 +66,7 @@ def flatten(root, filter=None) -> dict:  # pylint: disable=redefined-builtin
                 for idx, value in enumerate(entry):
                     yield from do_flattening(value, path + (idx,))
             else:
-                raise TypeError("Cannot flatten type '{}'".format(type(entry)))
+                raise TypeError(f"Cannot flatten type '{type(entry)}'")
         else:
             yield path, entry
 
