@@ -2,6 +2,7 @@
 import asyncio
 import concurrent.futures
 import contextlib
+import threading
 
 import pytest
 
@@ -47,7 +48,7 @@ def test_async_context(loop_scheduler):  # pylint: disable=redefined-outer-name
 
 
 def test_async_context_exception(
-    loop_scheduler,
+        loop_scheduler,
 ):  # pylint: disable=redefined-outer-name
     @contextlib.asynccontextmanager
     async def raises_before_yield():
@@ -137,3 +138,26 @@ def test_await_ctx_futures(loop_scheduler):  # pylint: disable=redefined-outer-n
     with loop_scheduler.async_ctx(ctx()) as future:
         assert isinstance(future, concurrent.futures.Future)
         future.set_result(True)
+
+
+def test_scheduler_time(loop_scheduler):
+    """Check that the scheduler's .time() method works"""
+    start_time = loop_scheduler.time()
+    assert loop_scheduler.time() > start_time
+
+
+def test_scheduler_call_at(loop_scheduler):
+    """Check that we can schedule the loop to call a callback at a particular time in the future"""
+    evt = threading.Event()
+
+    def set():
+        evt.set()
+
+    loop_scheduler.call_at(loop_scheduler.time() + 0.001, set)
+    assert evt.wait(timeout=1.) is True
+
+    evt.clear()
+    handle = loop_scheduler.call_at(loop_scheduler.time() + 10., set)
+    handle.cancel()
+    assert handle.cancelled()
+    assert not evt.is_set()

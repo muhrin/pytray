@@ -15,7 +15,7 @@ import logging
 import sys
 import threading
 import typing
-from typing import Callable
+from typing import Callable, Union
 
 from . import futures
 
@@ -271,6 +271,15 @@ class LoopScheduler:
                 running = False
             else:
                 yield target
+
+    def call_at(self, when: Union[int, float], callback, *args) -> asyncio.TimerHandle:
+        """Schedule `callback` to be called at a given absolute timestamp `when` (an int or a float), using the same
+        time reference as scheduler.time()"""
+        return self.submit(self._loop.call_at, when, callback, *args).result(timeout=self.task_timeout)
+
+    def time(self) -> float:
+        """Return the current time, as a float value, according to the event loop’s internal monotonic clock."""
+        return self._loop.time()
 
     def _ensure_running(self):
         if self._asyncio_thread is not None:
